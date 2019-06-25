@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Panacea.Modules.ScreenCast
 {
-    class ScreenCastPlugin : IScreenCastPlugin
+    public class ScreenCastPlugin : IScreenCastPlugin
     {
         IScreenCastPlayer ScreenCastPlayer;
         PanaceaServices _core;
