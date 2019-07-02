@@ -31,9 +31,11 @@ namespace Panacea.Modules.ScreenCast
         public ScreenCastPlayer(PanaceaServices core)
         {
             this._core = core;
-            if (_core.TryGetPairingPlugin(out IPairingPlugin _pairing)) {
-                if (_pairing.GetBoundTerminalManager().IsBound()) {
-                    BoundTerminal = _pairing.GetBoundTerminalManager().GetBoundTerminal();
+            if (_core.TryGetPairing(out IBoundTerminalManager _pairing))
+            {
+                if (_pairing.IsBound())
+                {
+                    BoundTerminal = _pairing.GetBoundTerminal();
                     if (BoundTerminal.Relation == TerminalRelation.Slave)
                     {
                         BoundTerminal.On<MediaPlayerMessage>("mediaplayer", OnMessageFromMaster);
@@ -236,7 +238,7 @@ namespace Panacea.Modules.ScreenCast
         }
         private void Result_IsSeekableChanged(object sender, bool e)
         {
-            Task.Run(() => BoundTerminal.Send("mediaplayer", new MediaPlayerMessage() { Action = "seekable-changed"}));
+            Task.Run(() => BoundTerminal.Send("mediaplayer", new MediaPlayerMessage() { Action = "seekable-changed" }));
         }
         private void Result_Opening(object sender, EventArgs e)
         {
@@ -244,11 +246,11 @@ namespace Panacea.Modules.ScreenCast
         }
         private void Result_Paused(object sender, EventArgs e)
         {
-            Task.Run(() => BoundTerminal.Send("mediaplayer", new MediaPlayerMessage() { Action = "paused"}));
+            Task.Run(() => BoundTerminal.Send("mediaplayer", new MediaPlayerMessage() { Action = "paused" }));
         }
         private void Result_PositionChanged(object sender, float e)
         {
-            Task.Run(() => BoundTerminal.Send("mediaplayer", new MediaPlayerMessage() { Action = "position", Position=e }));
+            Task.Run(() => BoundTerminal.Send("mediaplayer", new MediaPlayerMessage() { Action = "position", Position = e }));
         }
         private void Result_NowPlaying(object sender, string e)
         {
@@ -271,7 +273,7 @@ namespace Panacea.Modules.ScreenCast
             Task.Run(() => BoundTerminal.Send("mediaplayer", new MediaPlayerMessage() { Action = "playing" }));
         }
 
-        
+
         /* Events invoked by master to to be used by other plugins in the master terminal
          */
         public event EventHandler<bool> IsSeekableChanged;
@@ -308,11 +310,11 @@ namespace Panacea.Modules.ScreenCast
          */
         public void Next()
         {
-            Task.Run(() => BoundTerminal.Send("mediaplayer", new MediaPlayerMessage { Action = "next"}));
+            Task.Run(() => BoundTerminal.Send("mediaplayer", new MediaPlayerMessage { Action = "next" }));
         }
         public void Previous()
         {
-            Task.Run(() => BoundTerminal.Send("mediaplayer", new MediaPlayerMessage { Action = "previous"}));
+            Task.Run(() => BoundTerminal.Send("mediaplayer", new MediaPlayerMessage { Action = "previous" }));
         }
         public void Pause()
         {
@@ -331,7 +333,8 @@ namespace Panacea.Modules.ScreenCast
             if (on)
             {
                 Task.Run(() => BoundTerminal.Send("mediaplayer", new MediaPlayerMessage() { Action = "subtitles-on" }));
-            } else
+            }
+            else
             {
                 Task.Run(() => BoundTerminal.Send("mediaplayer", new MediaPlayerMessage() { Action = "subtitles-off" }));
             }
@@ -354,10 +357,11 @@ namespace Panacea.Modules.ScreenCast
         private bool isBoundAs(TerminalRelation role, out IBoundTerminal boundTerminal)
         {
             boundTerminal = null;
-            if (_core.TryGetPairingPlugin(out IPairingPlugin pairing)){
-                if (pairing.GetBoundTerminalManager().IsBound() && pairing.GetBoundTerminalManager().GetBoundTerminal().Relation == role)
+            if (_core.TryGetPairing(out IBoundTerminalManager pairing))
+            {
+                if (pairing.IsBound() && pairing.GetBoundTerminal().Relation == role)
                 {
-                    var bound = pairing.GetBoundTerminalManager().GetBoundTerminal();
+                    var bound = pairing.GetBoundTerminal();
                     if (bound.Relation == role)
                     {
                         return true;
