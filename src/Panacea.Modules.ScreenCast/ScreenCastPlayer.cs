@@ -28,6 +28,8 @@ namespace Panacea.Modules.ScreenCast
         Translator translator = new Translator("ScreenCast");
         public IBoundTerminal BoundTerminal { get; }
         public IMediaResponse result { get; private set; }
+
+        public event EventHandler VolumeChanged;
         public ScreenCastPlayer(PanaceaServices core)
         {
             this._core = core;
@@ -136,7 +138,7 @@ namespace Panacea.Modules.ScreenCast
                     {
                         if (_core.TryGetAudioManager(out _audio))
                         {
-                            Task.Run(() => BoundTerminal.Send("mediaplayer", new MediaPlayerMessage { Action = "getvolume", Volume = _audio.SpeakersVolume }));
+                            Task.Run(() => BoundTerminal.Send("mediaplayer", new MediaPlayerMessage { Action = "getvolume", Volume = _audio.SpeakersVolume /100f }));
                         }
                     }
                     break;
@@ -145,6 +147,7 @@ namespace Panacea.Modules.ScreenCast
             }
         }
 
+        public int Volume { get; private set; }
 
         /* Messages sent from slave to master to inform about the current state
          */
@@ -181,6 +184,11 @@ namespace Panacea.Modules.ScreenCast
                     break;
                 case "pausable-changed":
                     //TODO: Need to be able to send bool
+                    break;
+                case "volume":
+                case "getvolume":
+                    Volume = (int)Math.Round(msg.Volume * 100f);
+                    VolumeChanged?.Invoke(this, null);
                     break;
                 case "has-subtitles-changed":
                     //TODO: Need to be able to send bool
@@ -320,8 +328,9 @@ namespace Panacea.Modules.ScreenCast
         {
             Task.Run(() => BoundTerminal.Send("mediaplayer", new MediaPlayerMessage() { Action = "pause" }));
         }
-        public void Play(string url, MediaItem media)
+        public void Play(MediaItem media)
         {
+            Task.Run(() => BoundTerminal.Send("mediaplayer", new MediaPlayerMessage() { Action = "getvolume" }));
             Task.Run(() => BoundTerminal.Send("mediaplayer", new MediaPlayerMessage() { Action = "play", Mrl = media.GetMRL(), Extras = media.GetExtras() }));
         }
         public void Play()
@@ -341,7 +350,8 @@ namespace Panacea.Modules.ScreenCast
         }
         public void SetVolume(int value)
         {
-            Task.Run(() => BoundTerminal.Send("mediaplayer", new MediaPlayerMessage { Action = "volume", Volume = value }));
+            Task.Run(() => BoundTerminal.Send("mediaplayer", new MediaPlayerMessage { Action = "volume", Volume = value / 100f }));
+            Task.Run(() => BoundTerminal.Send("mediaplayer", new MediaPlayerMessage { Action = "getvolume" }));
         }
         public void Stop()
         {

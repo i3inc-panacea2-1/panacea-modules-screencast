@@ -34,6 +34,7 @@ namespace Panacea.Modules.ScreenCast
         public Task EndInit()
         {
             ScreenCastPlayer = new ScreenCastPlayer(_core);
+            
             return Task.CompletedTask;
         }
 
