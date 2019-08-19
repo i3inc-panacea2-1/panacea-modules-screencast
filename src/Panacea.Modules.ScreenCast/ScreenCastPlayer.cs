@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Windows;
 using Panacea.Core;
 using Panacea.Modularity.AudioManager;
 using Panacea.Modularity.Media;
@@ -313,6 +314,8 @@ namespace Panacea.Modules.ScreenCast
         public TimeSpan Duration { get; }
         public bool HasSubtitles { get; }
 
+        public FrameworkElement VideoControl => throw new NotImplementedException();
+
 
         /* Public methods to be called on master from other plugins
          */
@@ -328,10 +331,11 @@ namespace Panacea.Modules.ScreenCast
         {
             Task.Run(() => BoundTerminal.Send("mediaplayer", new MediaPlayerMessage() { Action = "pause" }));
         }
-        public void Play(MediaItem media)
+        public Task Play(MediaItem media)
         {
             Task.Run(() => BoundTerminal.Send("mediaplayer", new MediaPlayerMessage() { Action = "getvolume" }));
             Task.Run(() => BoundTerminal.Send("mediaplayer", new MediaPlayerMessage() { Action = "play", Mrl = media.GetMRL(), Extras = media.GetExtras() }));
+            return Task.CompletedTask;
         }
         public void Play()
         {
@@ -378,6 +382,18 @@ namespace Panacea.Modules.ScreenCast
                     }
                 }
             }
+            return false;
+        }
+
+        public bool CanPlayChannel(MediaItem channel)
+        {
+            return true;
+        }
+
+       
+
+        public bool HasMoreChapters()
+        {
             return false;
         }
     }
