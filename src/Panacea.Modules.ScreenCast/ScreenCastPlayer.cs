@@ -39,6 +39,7 @@ namespace Panacea.Modules.ScreenCast
                 if (_pairing.IsBound())
                 {
                     BoundTerminal = _pairing.GetBoundTerminal();
+                    BoundTerminal.Disconnected += BoundTerminal_Disconnected;
                     if (BoundTerminal.Relation == TerminalRelation.Slave)
                     {
                         BoundTerminal.On<MediaPlayerMessage>("mediaplayer", OnMessageFromMaster);
@@ -49,6 +50,11 @@ namespace Panacea.Modules.ScreenCast
                     }
                 }
             }
+        }
+
+        private void BoundTerminal_Disconnected(object sender, EventArgs e)
+        {
+            Stop();
         }
 
 
@@ -92,7 +98,10 @@ namespace Panacea.Modules.ScreenCast
                     {
                         if (!string.IsNullOrEmpty(msg.Mrl))
                         {
-                            result = container.Play(new MediaRequest(new IptvMedia() { URL = msg.Mrl + " " + msg.Extras }));
+                            result = container.Play(new MediaRequest(new IptvMedia() { URL = msg.Mrl + " " + msg.Extras })
+                            {
+                                FullscreenMode = FullscreenMode.FullscreenOnly
+                            });
                             AttachToMediaResponse(result);
                         }
                         else
@@ -139,7 +148,7 @@ namespace Panacea.Modules.ScreenCast
                     {
                         if (_core.TryGetAudioManager(out _audio))
                         {
-                            Task.Run(() => BoundTerminal.Send("mediaplayer", new MediaPlayerMessage { Action = "getvolume", Volume = _audio.SpeakersVolume /100f }));
+                            Task.Run(() => BoundTerminal.Send("mediaplayer", new MediaPlayerMessage { Action = "getvolume", Volume = _audio.SpeakersVolume / 100f }));
                         }
                     }
                     break;
@@ -390,7 +399,7 @@ namespace Panacea.Modules.ScreenCast
             return true;
         }
 
-       
+
 
         public bool HasMoreChapters()
         {
