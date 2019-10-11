@@ -39,13 +39,15 @@ namespace Panacea.Modules.ScreenCast
                 if (_pairing.IsBound())
                 {
                     BoundTerminal = _pairing.GetBoundTerminal();
-                    BoundTerminal.Disconnected += BoundTerminal_Disconnected;
+                    
                     if (BoundTerminal.Relation == TerminalRelation.Slave)
                     {
+                        BoundTerminal.Disconnected += BoundTerminal_Disconnected;
                         BoundTerminal.On<MediaPlayerMessage>("mediaplayer", OnMessageFromMaster);
                     }
                     else
                     {
+                        
                         BoundTerminal.On<MediaPlayerMessage>("mediaplayer", OnMessageFromSlave);
                     }
                 }
@@ -54,7 +56,7 @@ namespace Panacea.Modules.ScreenCast
 
         private void BoundTerminal_Disconnected(object sender, EventArgs e)
         {
-            Stop();
+            result?.Stop();
         }
 
 
