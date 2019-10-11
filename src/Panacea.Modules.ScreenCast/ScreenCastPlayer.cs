@@ -152,7 +152,7 @@ namespace Panacea.Modules.ScreenCast
                     {
                         if (_core.TryGetAudioManager(out _audio))
                         {
-                            _audio.SpeakersVolume = (int)(msg.Volume * 100f);
+                            _audio.SpeakersVolume = (int)Math.Round(msg.Volume * 100f);
                         }
                     }
                     break;
