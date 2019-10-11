@@ -56,7 +56,18 @@ namespace Panacea.Modules.ScreenCast
 
         private void BoundTerminal_Disconnected(object sender, EventArgs e)
         {
-            result?.Stop();
+            if (Application.Current != null)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    result?.Stop();
+                });
+            }
+            else
+            {
+                result?.Stop();
+            }
+            
         }
 
 
